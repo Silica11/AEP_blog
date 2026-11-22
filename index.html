@@ -2,12 +2,12 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Asingeran Excavation Project - Field Diary</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://script.google.com/macros/s/AKfycbwGGJ6DclGT0gbibSLlGu7xDC9UBiYgwNkw6j4gE4FodVp9U8lTpkZYLDBhjU1rgQWT0g/exec">
-
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
       --red-primary: #7c0809;
@@ -31,6 +31,7 @@
       min-height: 100vh;
     }
 
+    /* Contenitore App Mobile-First */
     .app-shell {
       width: 100%;
       max-width: 520px;
@@ -39,32 +40,40 @@
       padding: 20px 16px 40px;
     }
 
+    /* Intestazione (Header) con titolo isolato */
     .header-card {
       background-color: var(--card-white);
       border-radius: 24px;
-      padding: 24px 20px;
+      padding: 28px 22px 24px;
       text-align: center;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
       margin-bottom: 24px;
       border: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .logo-img {
-      max-width: 240px;
-      max-height: 110px;
+      max-width: 220px;
+      max-height: 100px;
       width: auto;
       height: auto;
       object-fit: contain;
-      margin: 0 auto 12px;
+      margin-bottom: 16px;
       display: block;
     }
 
     .project-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.75rem;
+      font-size: 1.9rem;
       font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 16px;
+      color: var(--black-ink);
+      line-height: 1.15;
+      margin-bottom: 22px;
+      padding-bottom: 20px;
+      width: 100%;
+      border-bottom: 1px solid var(--border-light);
     }
 
     .ig-btn {
@@ -74,15 +83,16 @@
       background-color: var(--red-primary);
       color: #ffffff;
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 999px;
       transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     .ig-btn:active { transform: scale(0.96); opacity: 0.9; }
 
+    /* Titolo Sezione */
     .section-label {
       font-size: 0.8rem;
       font-weight: 700;
@@ -92,6 +102,7 @@
       margin: 0 0 12px 6px;
     }
 
+    /* Lista Articoli */
     .articles-list {
       display: flex;
       flex-direction: column;
@@ -113,6 +124,7 @@
 
     .article-card:active { transform: scale(0.98); }
 
+    /* Riquadro Settimana / Mese */
     .time-badge {
       width: 84px;
       min-width: 84px;
@@ -151,6 +163,7 @@
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 1.25rem;
       font-weight: 700;
+      color: var(--black-ink);
       line-height: 1.2;
       margin-bottom: 6px;
     }
@@ -169,8 +182,12 @@
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--red-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
+    /* Scheda Articolo Completo (Sale dal basso) */
     .sheet-overlay {
       position: fixed;
       inset: 0;
@@ -185,7 +202,10 @@
       align-items: flex-end;
     }
 
-    .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+    .sheet-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     .article-sheet {
       width: 100%;
@@ -201,7 +221,9 @@
       box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
     }
 
-    .sheet-overlay.active .article-sheet { transform: translateY(0); }
+    .sheet-overlay.active .article-sheet {
+      transform: translateY(0);
+    }
 
     .sheet-topbar {
       padding: 14px 20px;
@@ -210,6 +232,9 @@
       justify-content: space-between;
       border-bottom: 1px solid var(--border-light);
       background: var(--card-white);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .sheet-badge-pill {
@@ -228,7 +253,7 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 600;
       color: var(--black-ink);
       cursor: pointer;
@@ -243,16 +268,22 @@
       flex: 1;
     }
 
-    .sheet-date { font-size: 0.8rem; color: var(--slate-mid); margin-bottom: 4px; }
+    .sheet-date {
+      font-size: 0.8rem;
+      color: var(--slate-mid);
+      margin-bottom: 4px;
+    }
 
     .sheet-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 1.85rem;
       font-weight: 700;
       line-height: 1.15;
+      color: var(--black-ink);
       margin-bottom: 18px;
     }
 
+    /* Contenitore Embed Instagram */
     .ig-embed-wrapper {
       margin-bottom: 22px;
       border-radius: 16px;
@@ -264,17 +295,22 @@
       justify-content: center;
     }
 
-    .ig-embed-wrapper iframe { width: 100%; border: none; }
+    .ig-embed-wrapper iframe {
+      width: 100% !important;
+      border: none !important;
+    }
 
     .article-body-text {
       font-size: 1rem;
       line-height: 1.75;
+      color: var(--black-ink);
       white-space: pre-line;
     }
 
-    .article-body-text strong { font-weight: 700; }
+    .article-body-text strong { font-weight: 700; color: var(--black-ink); }
     .article-body-text em { font-style: italic; }
 
+    /* Loading state */
     .loader {
       text-align: center;
       padding: 40px 20px;
@@ -289,7 +325,7 @@
     <header class="header-card">
       <img src="logo.png" alt="Logo Progetto" class="logo-img" onerror="this.style.display='none'">
       <h1 class="project-title" id="project-name">Asingeran Excavation Project</h1>
-      <a href="#" target="_blank" rel="noopener" class="ig-btn" id="ig-profile-link">
+      <a href="https://instagram.com" target="_blank" rel="noopener" class="ig-btn" id="ig-profile-link">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
         Torna su Instagram
       </a>
@@ -301,11 +337,11 @@
     </main>
   </div>
 
-  <!-- Scheda articolo che sale dal basso -->
+  <!-- Scheda Articolo che sale dal basso -->
   <div class="sheet-overlay" id="sheet-overlay" onclick="closeArticle()">
     <div class="article-sheet" onclick="event.stopPropagation()">
       <div class="sheet-topbar">
-        <span class="sheet-badge-pill" id="sheet-badge">DIARIO</span>
+        <span class="sheet-badge-pill" id="sheet-badge">SETT. 01</span>
         <button class="close-btn" onclick="closeArticle()" aria-label="Chiudi">✕</button>
       </div>
       <div class="sheet-scroll-body" id="sheet-scroll-body">
@@ -318,57 +354,55 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw00E3ozsW7wWYQ0Xdyul2CBfUpDefpG-Df1gwKqrqg3jI0mV2jzhmwKK77B6HUS8wTKA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwUUd-Ny9dVFWiCvTRUkWUo-UFoiIulf5SIH-OPdGFRI-_oBRjz238caJdV2fLNUx9uZg/exec";
     let articlesData = [];
 
-    // Protegge dall'HTML indesiderato nei testi provenienti dal foglio
-    function escapeHtml(text) {
-      return String(text ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
+        // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
     function parseMarkdown(text) {
       if (!text) return "";
-      let safeText = escapeHtml(text);
+      let safeText = String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      
       safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
       return safeText;
     }
 
-    // Estrae l'URL pulito per l'embed del post/carosello Instagram
+    // Estrae l'URL pulito per l'embed del carosello Instagram
     function getInstagramEmbedUrl(postUrl) {
       if (!postUrl) return null;
       const match = String(postUrl).match(/instagram\.com\/(p|reel)\/([a-zA-Z0-9_-]+)/);
-      if (match) {
-        return `https://www.instagram.com/${match[1]}/${match[2]}/embed/`;
+      if (match && match[1] && match[2]) {
+        return `https://instagram.com{match[1]}/${match[2]}/embed/`;
       }
       return null;
     }
 
     // Carica i dati da Google Sheets
     fetch(API_URL)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Risposta rete non valida");
+        return res.json();
+      })
       .then(data => {
-        // Home: prende la prima riga del foglio "home"
+        // Imposta Home (prende il primo elemento dell'array data.home)
         const homeInfo = Array.isArray(data.home) ? data.home[0] : data.home;
         if (homeInfo) {
           if (homeInfo.Nome_Progetto) {
-            document.getElementById('project-name').textContent = homeInfo.Nome_Progetto;
-            document.title = homeInfo.Nome_Progetto;
+            document.getElementById('project-name').textContent = homeInfo.Nome_Progetto.trim();
+            document.title = homeInfo.Nome_Progetto.trim();
           }
           if (homeInfo.Link_Instagram) {
-            document.getElementById('ig-profile-link').href = homeInfo.Link_Instagram;
+            document.getElementById('ig-profile-link').href = homeInfo.Link_Instagram.trim();
           }
         }
 
-        // Lista articoli
+        // Popola lista articoli
         articlesData = data.articoli || [];
         const container = document.getElementById('articles-container');
-
+        
         if (articlesData.length === 0) {
           container.innerHTML = `<div class="loader">Nessun racconto pubblicato al momento.</div>`;
           return;
@@ -376,12 +410,12 @@
 
         container.innerHTML = articlesData.map((art, index) => `
           <article class="article-card" onclick="openArticle(${index})">
-            <div class="time-badge">${escapeHtml(art.Badge_Tempo || 'DIARIO')}</div>
+            <div class="time-badge">${art.Badge_Tempo || 'DIARIO'}</div>
             <div class="card-content">
               <div>
-                <div class="card-date">${escapeHtml(art.Data || '')}</div>
-                <h2 class="card-title">${escapeHtml(art.Titolo || '')}</h2>
-                <p class="card-preview">${escapeHtml(art.Anteprima || '')}</p>
+                <div class="card-date">${art.Data || ''}</div>
+                <h2 class="card-title">${art.Titolo || ''}</h2>
+                <p class="card-preview">${art.Anteprima || ''}</p>
               </div>
               <span class="read-more">Read more →</span>
             </div>
@@ -390,8 +424,8 @@
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('articles-container').innerHTML =
-          `<div class="loader">Errore nel caricamento dei dati. Controlla i permessi dello script.</div>`;
+        document.getElementById('articles-container').innerHTML = 
+          `<div class="loader">Errore nel caricamento dei dati. Verifica che il deployment di Apps Script sia impostato su "Chiunque".</div>`;
       });
 
     // Apre l'articolo con animazione dal basso
@@ -409,7 +443,7 @@
 
       if (embedUrl) {
         igContainer.style.display = 'flex';
-        igContainer.innerHTML = `<iframe src="${embedUrl}" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
+        igContainer.innerHTML = `<iframe src="${embedUrl}" height="520" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
       } else {
         igContainer.style.display = 'none';
         igContainer.innerHTML = '';
