@@ -353,13 +353,12 @@
     </div>
   </div>
 
-   <script async src="https://instagram.com"></script>
+  <script async src="https://instagram.com"></script>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwUUd-Ny9dVFWiCvTRUkWUo-UFoiIulf5SIH-OPdGFRI-_oBRjz238caJdV2fLNUx9uZg/exec";
+    const API_URL = "https://google.com";
     let articlesData = [];
 
-    // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
     function parseMarkdown(text) {
       if (!text) return "";
       let safeText = String(text)
@@ -372,10 +371,11 @@
       return safeText;
     }
 
-    // Estrae l'URL pulito del post/carosello Instagram
+    // Estrae l'URL pulito del post/carosello Instagram (CORRETTO)
     function getInstagramEmbedUrl(postUrl) {
       if (!postUrl) return null;
-      const parts = String(postUrl).split('?')[0].split('/');
+      const cleanStr = String(postUrl).split('?')[0];
+      const parts = cleanStr.split('/');
       const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
       if (typeIndex !== -1 && parts[typeIndex + 1]) {
         return 'https://instagram.com' + parts[typeIndex] + '/' + parts[typeIndex + 1] + '/';
@@ -383,14 +383,12 @@
       return null;
     }
 
-    // Carica i dati da Google Sheets
     fetch(API_URL)
       .then(res => {
         if (!res.ok) throw new Error("Risposta rete non valida");
         return res.json();
       })
       .then(data => {
-        // Imposta Home (prende il primo elemento dell'array data.home)
         const homeInfo = Array.isArray(data.home) ? data.home[0] : data.home;
         if (homeInfo) {
           if (homeInfo.Nome_Progetto) {
@@ -402,7 +400,6 @@
           }
         }
 
-        // Popola lista articoli
         articlesData = data.articoli || [];
         const container = document.getElementById('articles-container');
         
@@ -428,10 +425,9 @@
       .catch(err => {
         console.error(err);
         document.getElementById('articles-container').innerHTML = 
-          `<div class="loader">Errore nel caricamento dei dati. Verifica che il deployment di Apps Script sia impostato su "Chiunque".</div>`;
+          `<div class="loader">Errore nel caricamento dei dati.</div>`;
       });
 
-    // Apre l'articolo con animazione dal basso e carica il carosello Instagram
     function openArticle(index) {
       const art = articlesData[index];
       if (!art) return;
@@ -451,6 +447,7 @@
             data-instgrm-permalink="${embedUrl}" 
             data-instgrm-version="14" 
             style="background:#FFF; border:0; border-radius:12px; margin:0; max-width:340px; width:100%;">
+            <a href="${embedUrl}" target="_blank" style="display:block; padding:20px; text-align:center; color:#7c0809; font-weight:600; text-decoration:none;">Caricamento foto Instagram...</a>
           </blockquote>
         `;
         if (window.instgrm && window.instgrm.Embeds) {
@@ -466,7 +463,6 @@
       document.body.style.overflow = 'hidden';
     }
 
-    // Chiude l'articolo
     function closeArticle() {
       document.getElementById('sheet-overlay').classList.remove('active');
       document.body.style.overflow = '';
