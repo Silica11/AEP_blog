@@ -283,29 +283,29 @@
       margin-bottom: 18px;
     }
 
-    /* Contenitore Embed Instagram */
+        /* Finestra Carosello Instagram più compatta */
     .ig-embed-wrapper {
-      margin-bottom: 22px;
-      border-radius: 16px;
+      max-width: 340px;
+      margin: 0 auto 24px auto;
+      border-radius: 14px;
       overflow: hidden;
-      background: #ffffff;
-      border: 1px solid var(--border-light);
-      min-height: 320px;
       display: flex;
       justify-content: center;
     }
+
 
     .ig-embed-wrapper iframe {
       width: 100% !important;
       border: none !important;
     }
 
-    .article-body-text {
-      font-size: 1rem;
-      line-height: 1.75;
+       .article-body-text {
+      font-size: 1.15rem;
+      line-height: 1.8;
       color: var(--black-ink);
       white-space: pre-line;
     }
+
 
     .article-body-text strong { font-weight: 700; color: var(--black-ink); }
     .article-body-text em { font-style: italic; }
@@ -353,11 +353,13 @@
     </div>
   </div>
 
+   <script async src="https://instagram.com"></script>
+
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwUUd-Ny9dVFWiCvTRUkWUo-UFoiIulf5SIH-OPdGFRI-_oBRjz238caJdV2fLNUx9uZg/exec";
     let articlesData = [];
 
-        // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
+    // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
     function parseMarkdown(text) {
       if (!text) return "";
       let safeText = String(text)
@@ -370,12 +372,13 @@
       return safeText;
     }
 
-    // Estrae l'URL pulito per l'embed del carosello Instagram
+    // Estrae l'URL pulito del post/carosello Instagram
     function getInstagramEmbedUrl(postUrl) {
       if (!postUrl) return null;
-      const match = String(postUrl).match(/instagram\.com\/(p|reel)\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1] && match[2]) {
-        return `https://instagram.com{match[1]}/${match[2]}/embed/`;
+      const parts = String(postUrl).split('?')[0].split('/');
+      const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
+      if (typeIndex !== -1 && parts[typeIndex + 1]) {
+        return 'https://instagram.com' + parts[typeIndex] + '/' + parts[typeIndex + 1] + '/';
       }
       return null;
     }
@@ -428,7 +431,7 @@
           `<div class="loader">Errore nel caricamento dei dati. Verifica che il deployment di Apps Script sia impostato su "Chiunque".</div>`;
       });
 
-    // Apre l'articolo con animazione dal basso
+    // Apre l'articolo con animazione dal basso e carica il carosello Instagram
     function openArticle(index) {
       const art = articlesData[index];
       if (!art) return;
@@ -443,7 +446,16 @@
 
       if (embedUrl) {
         igContainer.style.display = 'flex';
-        igContainer.innerHTML = `<iframe src="${embedUrl}" height="520" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
+        igContainer.innerHTML = `
+          <blockquote class="instagram-media" 
+            data-instgrm-permalink="${embedUrl}" 
+            data-instgrm-version="14" 
+            style="background:#FFF; border:0; border-radius:12px; margin:0; max-width:340px; width:100%;">
+          </blockquote>
+        `;
+        if (window.instgrm && window.instgrm.Embeds) {
+          window.instgrm.Embeds.process();
+        }
       } else {
         igContainer.style.display = 'none';
         igContainer.innerHTML = '';
