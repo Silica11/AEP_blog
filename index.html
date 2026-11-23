@@ -283,21 +283,27 @@
       margin-bottom: 18px;
     }
 
-        /* Finestra Carosello Instagram più compatta */
+           /* Finestra Carosello Instagram 3:4 ingrandita e ritagliata (solo foto + frecce + pallini) */
     .ig-embed-wrapper {
-      max-width: 340px;
-      margin: 0 auto 24px auto;
-      border-radius: 14px;
+      width: 100%;
+      max-width: 360px;
+      height: 495px; /* Proporzione 3:4 su 360px (480px foto + 15px pallini) */
+      margin: 0 auto 26px auto;
+      border-radius: 18px;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
+      position: relative;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border-light);
     }
-
 
     .ig-embed-wrapper iframe {
       width: 100% !important;
+      height: 660px !important;
+      margin-top: -54px !important; /* Taglia via l'intestazione profilo in alto */
       border: none !important;
+      display: block;
     }
+
 
        .article-body-text {
       font-size: 1.15rem;
