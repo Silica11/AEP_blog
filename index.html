@@ -371,14 +371,17 @@
     }
 
     // Estrae l'URL pulito per l'embed del carosello Instagram
-    function getInstagramEmbedUrl(postUrl) {
+       function getInstagramEmbedUrl(postUrl) {
       if (!postUrl) return null;
-      const match = String(postUrl).match(/instagram\.com\/(p|reel)\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1] && match[2]) {
-        return `https://instagram.com{match[1]}/${match[2]}/embed/`;
+      const cleanStr = String(postUrl).split('?').at(0);
+      const parts = cleanStr.split('/');
+      const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
+      if (typeIndex !== -1 && parts.at(typeIndex + 1)) {
+        return 'https://instagram.com' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/embed/';
       }
       return null;
     }
+
 
     // Carica i dati da Google Sheets
     fetch(API_URL)
