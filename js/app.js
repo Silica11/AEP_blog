@@ -1,4 +1,5 @@
 let articlesData = [];
+const CACHE_KEY = "aep_site_data_v1";
 
 // Cambio sezione nel menu
 function showSection(sectionId, btn) {
@@ -18,7 +19,7 @@ function parseMarkdown(text) {
   return safe;
 }
 
-// Estrae URL pulito per carosello Instagram
+// Estrae URL pulito per carosello Instagram (CON LO SLASH / CORRETTO)
 function getInstagramEmbedUrl(postUrl) {
   if (!postUrl) return null;
   const cleanStr = String(postUrl).split('?').at(0);
@@ -30,106 +31,123 @@ function getInstagramEmbedUrl(postUrl) {
   return null;
 }
 
-// Converte link Google Drive in immagine visibile ad alta risoluzione
+// Converte link file Google Drive in immagine visibile ad alta risoluzione
 function formatDriveImage(url) {
   if (!url) return "";
   const str = String(url).trim();
-  if (str.includes('drive.google.com')) {
+  if (str.includes('://google.com') && !str.includes('/folders/')) {
     const match = str.match(/[-\w]{25,}/);
     if (match) {
-      return 'https://google.com' + match.at(0) + '&sz=w1200';
+      return 'https://://google.com/thumbnail?id=' + match.at(0) + '&sz=w1200';
     }
   }
   return str;
 }
 
+// Funzione che disegna tutti i dati sulla pagina
+function renderSiteData(data) {
+  if (!data) return;
 
-// Scarica i dati da Google Sheets
+  // 1. Popola HOME
+  const home = Array.isArray(data.home) ? data.home.at(0) : data.home;
+  if (home) {
+    const title = home.Project_Name || home.Nome_Progetto;
+    const igUrl = home.Instagram_URL || home.Link_Instagram;
+    if (title) {
+      document.getElementById('project-name').textContent = String(title).trim();
+      document.title = String(title).trim();
+    }
+    if (home.Tagline) document.getElementById('project-tagline').textContent = home.Tagline;
+    if (igUrl && String(igUrl).trim() !== "") {
+      document.getElementById('ig-profile-link').href = String(igUrl).trim();
+    }
+    if (home.About_Text) {
+      document.getElementById('about-box').style.display = 'block';
+      document.getElementById('about-text').innerHTML = parseMarkdown(home.About_Text);
+    }
+    if (home.Join_Text) document.getElementById('join-text').innerHTML = parseMarkdown(home.Join_Text);
+    if (home.Email) document.getElementById('contact-email-box').textContent = "Email: " + home.Email;
+  }
+
+  // 2. Popola BLOG / FIELD DIARY
+  articlesData = data.blog || data.articoli || [];
+  const blogContainer = document.getElementById('articles-container');
+  if (articlesData.length > 0) {
+    blogContainer.innerHTML = articlesData.map((art, index) => `
+      <article class="article-card" onclick="openArticle(${index})">
+        <div class="time-badge">${art.Badge_Time || art.Badge_Tempo || 'DIARY'}</div>
+        <div class="card-content">
+          <div>
+            <div class="card-date">${art.Date || art.Data || ''}</div>
+            <h3 class="card-title">${art.Title || art.Titolo || ''}</h3>
+            <p class="card-preview">${art.Preview || art.Anteprima || ''}</p>
+          </div>
+          <span class="read-more">Read more →</span>
+        </div>
+      </article>
+    `).join('');
+  } else {
+    blogContainer.innerHTML = '<div class="empty-state">No field diary entries published yet.</div>';
+  }
+
+  // 3. Popola PROGETTI / SITI
+  const projects = data.projects || [];
+  if (projects.length > 0) {
+    document.getElementById('projects-container').innerHTML = projects.map(p => `
+      <div class="grid-item">
+        ${p.Image_URL ? `<img src="${formatDriveImage(p.Image_URL)}" alt="${p.Site_Name || ''}">` : ''}
+        <div class="grid-item-body">
+          ${p.Period ? `<span class="badge-pill">${p.Period}</span>` : ''}
+          <h3 class="card-title">${p.Site_Name || ''}</h3>
+          <div class="card-date" style="margin-bottom:8px;">${p.Location || ''}</div>
+          <p style="font-size:0.9rem; color:var(--slate-mid);">${p.Description || ''}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // 4. Popola PUBBLICAZIONI
+  const pubs = data.publications || [];
+  if (pubs.length > 0) {
+    document.getElementById('publications-container').innerHTML = pubs.map(pub => `
+      <div class="content-box" style="margin-bottom:0;">
+        <span class="badge-pill">${pub.Year || ''}</span>
+        <h3 class="card-title">${pub.Title || ''}</h3>
+        <p class="card-date" style="margin-bottom:8px;">${pub.Authors || ''} — <em>${pub.Journal_Or_Book || ''}</em></p>
+        ${pub.Drive_PDF_URL ? `<a href="${pub.Drive_PDF_URL}" target="_blank" class="read-more" style="text-decoration:none;">Download / View PDF →</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // 5. Popola PORTFOLIO
+  const portfolio = data.portfolio || [];
+  if (portfolio.length > 0) {
+    document.getElementById('portfolio-container').innerHTML = portfolio.map(item => `
+      <div class="grid-item">
+        ${item.Image_URL ? `<img src="${formatDriveImage(item.Image_URL)}" alt="${item.Title || ''}">` : ''}
+        <div class="grid-item-body">
+          <h3 class="card-title">${item.Title || ''}</h3>
+          <p style="font-size:0.85rem; color:var(--slate-mid);">${item.Caption || ''}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// Carica subito dalla cache se disponibile (0ms di attesa!)
+const cachedData = localStorage.getItem(CACHE_KEY);
+if (cachedData) {
+  try {
+    renderSiteData(JSON.parse(cachedData));
+  } catch (e) {}
+}
+
+// Scarica i dati aggiornati da Google Sheets in background
 fetch(API_URL)
   .then(res => res.json())
   .then(data => {
-    // 1. Popola HOME (compatibile con le nuove colonne del tuo JSON)
-    const home = Array.isArray(data.home) ? data.home.at(0) : data.home;
-    if (home) {
-      const title = home.Project_Name || home.Nome_Progetto;
-      const igUrl = home.Instagram_URL || home.Link_Instagram;
-      if (title) {
-        document.getElementById('project-name').textContent = title.trim();
-        document.title = title.trim();
-      }
-      if (home.Tagline) document.getElementById('project-tagline').textContent = home.Tagline;
-      if (igUrl) document.getElementById('ig-profile-link').href = igUrl.trim();
-      if (home.About_Text) {
-        document.getElementById('about-box').style.display = 'block';
-        document.getElementById('about-text').innerHTML = parseMarkdown(home.About_Text);
-      }
-      if (home.Join_Text) document.getElementById('join-text').innerHTML = parseMarkdown(home.Join_Text);
-      if (home.Email) document.getElementById('contact-email-box').textContent = "Email: " + home.Email;
-    }
-
-    // 2. Popola BLOG / FIELD DIARY
-    articlesData = data.blog || data.articoli || [];
-    const blogContainer = document.getElementById('articles-container');
-    if (articlesData.length > 0) {
-      blogContainer.innerHTML = articlesData.map((art, index) => `
-        <article class="article-card" onclick="openArticle(${index})">
-          <div class="time-badge">${art.Badge_Time || art.Badge_Tempo || 'DIARY'}</div>
-          <div class="card-content">
-            <div>
-              <div class="card-date">${art.Date || art.Data || ''}</div>
-              <h3 class="card-title">${art.Title || art.Titolo || ''}</h3>
-              <p class="card-preview">${art.Preview || art.Anteprima || ''}</p>
-            </div>
-            <span class="read-more">Read more →</span>
-          </div>
-        </article>
-      `).join('');
-    } else {
-      blogContainer.innerHTML = '<div class="empty-state">No field diary entries published yet.</div>';
-    }
-
-    // 3. Popola PROGETTI / SITI
-    const projects = data.projects || [];
-    if (projects.length > 0) {
-      document.getElementById('projects-container').innerHTML = projects.map(p => `
-        <div class="grid-item">
-          ${p.Image_URL ? `<img src="${formatDriveImage(p.Image_URL)}" alt="${p.Site_Name || ''}">` : ''}
-          <div class="grid-item-body">
-            ${p.Period ? `<span class="badge-pill">${p.Period}</span>` : ''}
-            <h3 class="card-title">${p.Site_Name || ''}</h3>
-            <div class="card-date" style="margin-bottom:8px;">${p.Location || ''}</div>
-            <p style="font-size:0.9rem; color:var(--slate-mid);">${p.Description || ''}</p>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // 4. Popola PUBBLICAZIONI
-    const pubs = data.publications || [];
-    if (pubs.length > 0) {
-      document.getElementById('publications-container').innerHTML = pubs.map(pub => `
-        <div class="content-box" style="margin-bottom:0;">
-          <span class="badge-pill">${pub.Year || ''}</span>
-          <h3 class="card-title">${pub.Title || ''}</h3>
-          <p class="card-date" style="margin-bottom:8px;">${pub.Authors || ''} — <em>${pub.Journal_Or_Book || ''}</em></p>
-          ${pub.Drive_PDF_URL ? `<a href="${pub.Drive_PDF_URL}" target="_blank" class="read-more" style="text-decoration:none;">Download / View PDF →</a>` : ''}
-        </div>
-      `).join('');
-    }
-
-    // 5. Popola PORTFOLIO
-    const portfolio = data.portfolio || [];
-    if (portfolio.length > 0) {
-      document.getElementById('portfolio-container').innerHTML = portfolio.map(item => `
-        <div class="grid-item">
-          ${item.Image_URL ? `<img src="${formatDriveImage(item.Image_URL)}" alt="${item.Title || ''}">` : ''}
-          <div class="grid-item-body">
-            <h3 class="card-title">${item.Title || ''}</h3>
-            <p style="font-size:0.85rem; color:var(--slate-mid);">${item.Caption || ''}</p>
-          </div>
-        </div>
-      `).join('');
-    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    renderSiteData(data);
   });
 
 // Apre singolo articolo del Field Diary
@@ -165,4 +183,3 @@ function closeArticle() {
     document.getElementById('sheet-ig-container').innerHTML = '';
   }, 350);
 }
-
