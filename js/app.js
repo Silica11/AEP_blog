@@ -30,16 +30,19 @@ function getInstagramEmbedUrl(postUrl) {
   return null;
 }
 
-// Converte link Google Drive in immagine diretta
+// Converte link Google Drive in immagine visibile ad alta risoluzione
 function formatDriveImage(url) {
   if (!url) return "";
-  const str = String(url);
-  if (str.includes('://google.com')) {
+  const str = String(url).trim();
+  if (str.includes('drive.google.com')) {
     const match = str.match(/[-\w]{25,}/);
-    if (match) return 'https://googleusercontent.com' + match.at(0);
+    if (match) {
+      return 'https://google.com' + match.at(0) + '&sz=w1200';
+    }
   }
   return str;
 }
+
 
 // Scarica i dati da Google Sheets
 fetch(API_URL)
