@@ -1,357 +1,101 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Asingeran Excavation Project - Field Diary</title>
+  <title>Asingeran Excavation Project</title>
   <link rel="preconnect" href="https://googleapis.com">
   <link rel="preconnect" href="https://gstatic.com" crossorigin>
   <link href="https://googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <style>
-    :root {
-      --red-primary: #7c0809;
-      --red-soft: #f4e8e8;
-      --stone-bg: #dedddd;
-      --card-white: #faf9f8;
-      --black-ink: #161515;
-      --slate-mid: #57534e;
-      --border-light: rgba(22, 21, 21, 0.08);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background-color: var(--stone-bg);
-      color: var(--black-ink);
-      line-height: 1.5;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    /* Contenitore App Mobile-First */
-    .app-shell {
-      width: 100%;
-      max-width: 520px;
-      background-color: var(--stone-bg);
-      min-height: 100vh;
-      padding: 20px 16px 40px;
-    }
-
-    /* Intestazione (Header) con titolo isolato */
-    .header-card {
-      background-color: var(--card-white);
-      border-radius: 24px;
-      padding: 28px 22px 24px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      margin-bottom: 24px;
-      border: 1px solid var(--border-light);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .logo-img {
-      max-width: 220px;
-      max-height: 100px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    .project-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.9rem;
-      font-weight: 700;
-      color: var(--black-ink);
-      line-height: 1.15;
-      margin-bottom: 22px;
-      padding-bottom: 20px;
-      width: 100%;
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .ig-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: var(--red-primary);
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 10px 22px;
-      border-radius: 999px;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .ig-btn:active { transform: scale(0.96); opacity: 0.9; }
-
-    /* Titolo Sezione */
-    .section-label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--slate-mid);
-      margin: 0 0 12px 6px;
-    }
-
-    /* Lista Articoli */
-    .articles-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .article-card {
-      background-color: var(--card-white);
-      border-radius: 20px;
-      padding: 14px;
-      display: flex;
-      align-items: stretch;
-      gap: 14px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
-      border: 1px solid var(--border-light);
-      cursor: pointer;
-      transition: transform 0.15s ease;
-    }
-
-    .article-card:active { transform: scale(0.98); }
-
-    /* Riquadro Settimana / Mese */
-    .time-badge {
-      width: 84px;
-      min-width: 84px;
-      background-color: var(--red-primary);
-      color: #ffffff;
-      border-radius: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8px 6px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 0.03em;
-      line-height: 1.25;
-      text-transform: uppercase;
-    }
-
-    .card-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-width: 0;
-    }
-
-    .card-date {
-      font-size: 0.75rem;
-      color: var(--slate-mid);
-      font-weight: 500;
-      margin-bottom: 2px;
-    }
-
-    .card-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--black-ink);
-      line-height: 1.2;
-      margin-bottom: 6px;
-    }
-
-    .card-preview {
-      font-size: 0.85rem;
-      color: var(--slate-mid);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
-
-    .read-more {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--red-primary);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Scheda Articolo Completo (Sale dal basso) */
-    .sheet-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(22, 21, 21, 0.55);
-      backdrop-filter: blur(3px);
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-    }
-
-    .sheet-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .article-sheet {
-      width: 100%;
-      max-width: 520px;
-      height: 92vh;
-      background-color: var(--card-white);
-      border-radius: 28px 28px 0 0;
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
-    }
-
-    .sheet-overlay.active .article-sheet {
-      transform: translateY(0);
-    }
-
-    .sheet-topbar {
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-light);
-      background: var(--card-white);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .sheet-badge-pill {
-      background: var(--red-soft);
-      color: var(--red-primary);
-      font-weight: 700;
-      font-size: 0.75rem;
-      padding: 4px 12px;
-      border-radius: 999px;
-      text-transform: uppercase;
-    }
-
-    .close-btn {
-      background: var(--stone-bg);
-      border: none;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--black-ink);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .sheet-scroll-body {
-      padding: 20px 20px 50px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .sheet-date {
-      font-size: 0.8rem;
-      color: var(--slate-mid);
-      margin-bottom: 4px;
-    }
-
-    .sheet-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.85rem;
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--black-ink);
-      margin-bottom: 18px;
-    }
-
-           /* Finestra Carosello Instagram 3:4 ingrandita e ritagliata (solo foto + frecce + pallini) */
-    .ig-embed-wrapper {
-      width: 100%;
-      max-width: 360px;
-      height: 480px; /* Proporzione 3:4 su 360px (480px foto + 15px pallini) */
-      margin: 0 auto 26px auto;
-      border-radius: 18px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid var(--border-light);
-    }
-
-    .ig-embed-wrapper iframe {
-      width: 100% !important;
-      height: 660px !important;
-      margin-top: -54px !important; /* Taglia via l'intestazione profilo in alto */
-      border: none !important;
-      display: block;
-    }
-
-
-       .article-body-text {
-      font-size: 1.15rem;
-      line-height: 1.8;
-      color: var(--black-ink);
-      white-space: pre-line;
-    }
-
-
-    .article-body-text strong { font-weight: 700; color: var(--black-ink); }
-    .article-body-text em { font-style: italic; }
-
-    /* Loading state */
-    .loader {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--slate-mid);
-      font-size: 0.9rem;
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/carousel.css">
+  <link rel="stylesheet" href="css/sections.css">
 </head>
 <body>
 
-  <div class="app-shell">
-    <header class="header-card">
-      <img src="logo.png" alt="Logo Progetto" class="logo-img" onerror="this.style.display='none'">
-      <h1 class="project-title" id="project-name">Asingeran Excavation Project</h1>
-      <a href="https://instagram.com" target="_blank" rel="noopener" class="ig-btn" id="ig-profile-link">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        Torna su Instagram
-      </a>
-    </header>
+  <!-- Menu di Navigazione -->
+  <nav class="navbar">
+    <button class="nav-btn active" onclick="showSection('home', this)">Home</button>
+    <button class="nav-btn" onclick="showSection('blog', this)">Field Diary</button>
+    <button class="nav-btn" onclick="showSection('projects', this)">Sites</button>
+    <button class="nav-btn" onclick="showSection('publications', this)">Publications</button>
+    <button class="nav-btn" onclick="showSection('portfolio', this)">Portfolio</button>
+    <button class="nav-btn" onclick="showSection('join', this)">Join & Contact</button>
+  </nav>
 
-    <div class="section-label">Diario di Scavo</div>
-    <main class="articles-list" id="articles-container">
-      <div class="loader">Caricamento aggiornamenti dal cantiere...</div>
-    </main>
-  </div>
+  <main class="app-container">
 
-  <!-- Scheda Articolo che sale dal basso -->
+    <!-- 1. SEZIONE HOME -->
+    <section id="sec-home" class="page-section active">
+      <div class="hero-card">
+        <img src="logo.png" alt="AEP Logo" class="logo-img" onerror="this.style.display='none'">
+        <h1 class="project-title" id="project-name">Asingeran Excavation Project</h1>
+        <p class="project-tagline" id="project-tagline"></p>
+        <div class="divider-line"></div>
+        <a href="#" target="_blank" rel="noopener" class="ig-btn" id="ig-profile-link">
+          Follow on Instagram
+        </a>
+      </div>
+
+      <div class="content-box" id="about-box" style="display:none;">
+        <h2 class="section-heading">About the Project</h2>
+        <p id="about-text" style="white-space: pre-line;"></p>
+      </div>
+    </section>
+
+    <!-- 2. SEZIONE FIELD DIARY (BLOG) -->
+    <section id="sec-blog" class="page-section">
+      <h2 class="section-heading">Field Diary</h2>
+      <div class="articles-list" id="articles-container">
+        <div class="empty-state">Loading field updates...</div>
+      </div>
+    </section>
+
+    <!-- 3. SEZIONE PROGETTI / SITI -->
+    <section id="sec-projects" class="page-section">
+      <h2 class="section-heading">Excavation Sites</h2>
+      <div class="cards-grid" id="projects-container">
+        <div class="empty-state">Site profiles coming soon.</div>
+      </div>
+    </section>
+
+    <!-- 4. SEZIONE PUBBLICAZIONI -->
+    <section id="sec-publications" class="page-section">
+      <h2 class="section-heading">Publications</h2>
+      <div class="articles-list" id="publications-container">
+        <div class="empty-state">Scientific publications coming soon.</div>
+      </div>
+    </section>
+
+    <!-- 5. SEZIONE PORTFOLIO -->
+    <section id="sec-portfolio" class="page-section">
+      <h2 class="section-heading">Photo Portfolio</h2>
+      <div class="cards-grid" id="portfolio-container">
+        <div class="empty-state">Photo gallery coming soon.</div>
+      </div>
+    </section>
+
+    <!-- 6. SEZIONE JOIN & CONTACTS -->
+    <section id="sec-join" class="page-section">
+      <h2 class="section-heading">Join the Team & Contact</h2>
+      <div class="content-box">
+        <p id="join-text" style="white-space: pre-line; margin-bottom: 16px;">Want to join our next excavation campaign or collaborate with the team? Get in touch with us.</p>
+        <p id="contact-email-box" style="font-weight: 600; color: var(--red-primary);"></p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modale Articolo Completo -->
   <div class="sheet-overlay" id="sheet-overlay" onclick="closeArticle()">
     <div class="article-sheet" onclick="event.stopPropagation()">
       <div class="sheet-topbar">
-        <span class="sheet-badge-pill" id="sheet-badge">SETT. 01</span>
-        <button class="close-btn" onclick="closeArticle()" aria-label="Chiudi">✕</button>
+        <span class="badge-pill" id="sheet-badge">WEEK</span>
+        <button class="close-btn" onclick="closeArticle()" aria-label="Close">✕</button>
       </div>
       <div class="sheet-scroll-body" id="sheet-scroll-body">
-        <div class="sheet-date" id="sheet-date"></div>
+        <div class="card-date" id="sheet-date"></div>
         <h2 class="sheet-title" id="sheet-title"></h2>
         <div class="ig-embed-wrapper" id="sheet-ig-container"></div>
         <div class="article-body-text" id="sheet-content"></div>
@@ -359,119 +103,7 @@
     </div>
   </div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwUUd-Ny9dVFWiCvTRUkWUo-UFoiIulf5SIH-OPdGFRI-_oBRjz238caJdV2fLNUx9uZg/exec";
-    let articlesData = [];
-
-       // Converte **grassetto** e *corsivo* scritti su Google Sheets in HTML
-    function parseMarkdown(text) {
-      if (!text) return "";
-      let safeText = String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-      
-      safeText = safeText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      safeText = safeText.replace(/\*(.*?)\*/g, '<em>$1</em>');
-      return safeText;
-    }
-
-    // Estrae l'URL pulito per l'embed del carosello Instagram
-       function getInstagramEmbedUrl(postUrl) {
-      if (!postUrl) return null;
-      const cleanStr = String(postUrl).split('?').at(0);
-      const parts = cleanStr.split('/');
-      const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
-      if (typeIndex !== -1 && parts.at(typeIndex + 1)) {
-        return 'https://instagram.com/' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/embed/';
-      }
-      return null;
-    }
-
-
-    // Carica i dati da Google Sheets
-    fetch(API_URL)
-      .then(res => {
-        if (!res.ok) throw new Error("Risposta rete non valida");
-        return res.json();
-      })
-      .then(data => {
-        // Imposta Home (prende il primo elemento dell'array data.home)
-        const homeInfo = Array.isArray(data.home) ? data.home[0] : data.home;
-        if (homeInfo) {
-          if (homeInfo.Nome_Progetto) {
-            document.getElementById('project-name').textContent = homeInfo.Nome_Progetto.trim();
-            document.title = homeInfo.Nome_Progetto.trim();
-          }
-          if (homeInfo.Link_Instagram) {
-            document.getElementById('ig-profile-link').href = homeInfo.Link_Instagram.trim();
-          }
-        }
-
-        // Popola lista articoli
-        articlesData = data.articoli || [];
-        const container = document.getElementById('articles-container');
-        
-        if (articlesData.length === 0) {
-          container.innerHTML = `<div class="loader">Nessun racconto pubblicato al momento.</div>`;
-          return;
-        }
-
-        container.innerHTML = articlesData.map((art, index) => `
-          <article class="article-card" onclick="openArticle(${index})">
-            <div class="time-badge">${art.Badge_Tempo || 'DIARIO'}</div>
-            <div class="card-content">
-              <div>
-                <div class="card-date">${art.Data || ''}</div>
-                <h2 class="card-title">${art.Titolo || ''}</h2>
-                <p class="card-preview">${art.Anteprima || ''}</p>
-              </div>
-              <span class="read-more">Read more →</span>
-            </div>
-          </article>
-        `).join('');
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('articles-container').innerHTML = 
-          `<div class="loader">Errore nel caricamento dei dati. Verifica che il deployment di Apps Script sia impostato su "Chiunque".</div>`;
-      });
-
-    // Apre l'articolo con animazione dal basso
-    function openArticle(index) {
-      const art = articlesData[index];
-      if (!art) return;
-
-      document.getElementById('sheet-badge').textContent = art.Badge_Tempo || 'DIARIO';
-      document.getElementById('sheet-date').textContent = art.Data || '';
-      document.getElementById('sheet-title').textContent = art.Titolo || '';
-      document.getElementById('sheet-content').innerHTML = parseMarkdown(art.Testo_Completo);
-
-      const igContainer = document.getElementById('sheet-ig-container');
-      const embedUrl = getInstagramEmbedUrl(art.Link_Post_Instagram);
-
-      if (embedUrl) {
-        igContainer.style.display = 'flex';
-        igContainer.innerHTML = `<iframe src="${embedUrl}" height="520" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
-      } else {
-        igContainer.style.display = 'none';
-        igContainer.innerHTML = '';
-      }
-
-      document.getElementById('sheet-scroll-body').scrollTop = 0;
-      document.getElementById('sheet-overlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    // Chiude l'articolo
-    function closeArticle() {
-      document.getElementById('sheet-overlay').classList.remove('active');
-      document.body.style.overflow = '';
-      setTimeout(() => {
-        document.getElementById('sheet-ig-container').innerHTML = '';
-      }, 350);
-    }
-  </script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
-
