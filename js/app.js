@@ -46,17 +46,33 @@ function processInstagramEmbeds() {
   document.body.appendChild(sc);
 }
 
-// Converte link file Google Drive in immagine visibile ad alta risoluzione
-function formatDriveImage(url) {
-  if (!url) return "";
+// Estrae l'ID di un file Google Drive da qualunque formato di link
+function getDriveId(url) {
+  if (!url) return null;
   const str = String(url).trim();
-  if (str.includes('drive.google.com') && !str.includes('/folders/')) {
-    const match = str.match(/[-\w]{25,}/);
-    if (match) {
-      return 'https://drive.google.com/thumbnail?id=' + match.at(0) + '&sz=w1200';
-    }
+  if (!str.includes('drive.google.com') || str.includes('/folders/')) return null;
+  const match = str.match(/[-\w]{25,}/);
+  return match ? match.at(0) : null;
+}
+
+// Crea il tag <img>: prova più indirizzi di Drive finché uno funziona
+function driveImg(url, alt) {
+  const safeAlt = String(alt || '').replace(/"/g, '&quot;');
+  const id = getDriveId(url);
+  if (!id) {
+    return `<img src="${String(url).trim()}" alt="${safeAlt}" loading="lazy" referrerpolicy="no-referrer">`;
   }
-  return str;
+  return `<img src="https://lh3.googleusercontent.com/d/${id}=w1200" data-id="${id}" data-step="0"
+    alt="${safeAlt}" loading="lazy" referrerpolicy="no-referrer" onerror="driveImgFallback(this)">`;
+}
+
+function driveImgFallback(img) {
+  const id = img.dataset.id;
+  const step = Number(img.dataset.step || 0) + 1;
+  img.dataset.step = step;
+  if (step === 1) img.src = 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1200';
+  else if (step === 2) img.src = 'https://drive.google.com/uc?export=view&id=' + id;
+  else { img.onerror = null; img.style.display = 'none'; }
 }
 
 // Funzione che disegna tutti i dati sulla pagina
@@ -110,7 +126,7 @@ function renderSiteData(data) {
   if (projects.length > 0) {
     document.getElementById('projects-container').innerHTML = projects.map(p => `
       <div class="grid-item">
-        ${p.Image_URL ? `<img src="${formatDriveImage(p.Image_URL)}" alt="${p.Site_Name || ''}">` : ''}
+        ${p.Image_URL ? driveImg(p.Image_URL, p.Site_Name) : ''}
         <div class="grid-item-body">
           ${p.Period ? `<span class="badge-pill">${p.Period}</span>` : ''}
           <h3 class="card-title">${p.Site_Name || ''}</h3>
@@ -139,7 +155,7 @@ function renderSiteData(data) {
   if (portfolio.length > 0) {
     document.getElementById('portfolio-container').innerHTML = portfolio.map(item => `
       <div class="grid-item">
-        ${item.Image_URL ? `<img src="${formatDriveImage(item.Image_URL)}" alt="${item.Title || ''}">` : ''}
+        ${item.Image_URL ? driveImg(item.Image_URL, item.Title) : ''}
         <div class="grid-item-body">
           <h3 class="card-title">${item.Title || ''}</h3>
           <p style="font-size:0.85rem; color:var(--slate-mid);">${item.Caption || ''}</p>
