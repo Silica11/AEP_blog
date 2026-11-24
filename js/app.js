@@ -19,26 +19,41 @@ function parseMarkdown(text) {
   return safe;
 }
 
-// Estrae URL pulito per carosello Instagram (CON LO SLASH / CORRETTO)
+// Estrae il permalink pulito del post Instagram (senza parametri ?img_index=...)
 function getInstagramEmbedUrl(postUrl) {
   if (!postUrl) return null;
-  const cleanStr = String(postUrl).split('?').at(0);
+  const cleanStr = String(postUrl).trim().split('?').at(0);
   const parts = cleanStr.split('/');
   const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
   if (typeIndex !== -1 && parts.at(typeIndex + 1)) {
-    return 'https://instagram.com/' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/embed/';
+    return 'https://www.instagram.com/' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/';
   }
   return null;
+}
+
+// Carica lo script ufficiale di Instagram una sola volta e trasforma i blockquote in embed
+function processInstagramEmbeds() {
+  if (window.instgrm && window.instgrm.Embeds) {
+    window.instgrm.Embeds.process();
+    return;
+  }
+  if (document.getElementById('ig-embed-script')) return; // già in caricamento
+  const sc = document.createElement('script');
+  sc.id = 'ig-embed-script';
+  sc.async = true;
+  sc.src = 'https://www.instagram.com/embed.js';
+  sc.onload = () => { if (window.instgrm) window.instgrm.Embeds.process(); };
+  document.body.appendChild(sc);
 }
 
 // Converte link file Google Drive in immagine visibile ad alta risoluzione
 function formatDriveImage(url) {
   if (!url) return "";
   const str = String(url).trim();
-  if (str.includes('://google.com') && !str.includes('/folders/')) {
+  if (str.includes('drive.google.com') && !str.includes('/folders/')) {
     const match = str.match(/[-\w]{25,}/);
     if (match) {
-      return 'https://://google.com/thumbnail?id=' + match.at(0) + '&sz=w1200';
+      return 'https://drive.google.com/thumbnail?id=' + match.at(0) + '&sz=w1200';
     }
   }
   return str;
@@ -148,7 +163,8 @@ fetch(API_URL)
   .then(data => {
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
     renderSiteData(data);
-  });
+  })
+  .catch(err => console.error('Errore caricamento dati:', err));
 
 // Apre singolo articolo del Field Diary
 function openArticle(index) {
@@ -165,7 +181,15 @@ function openArticle(index) {
 
   if (embedUrl) {
     igContainer.style.display = 'flex';
-    igContainer.innerHTML = `<iframe src="${embedUrl}" frameborder="0" scrolling="no" allowtransparency="true"></iframe>`;
+    igContainer.innerHTML = `
+      <blockquote class="instagram-media" data-instgrm-permalink="${embedUrl}" data-instgrm-version="14"
+        style="background:#FFF; border:0; border-radius:12px; margin:0 auto; max-width:340px; width:100%;">
+        <a href="${embedUrl}" target="_blank" rel="noopener"
+          style="display:block; padding:20px; text-align:center; font-weight:600; text-decoration:none;">
+          Apri il post su Instagram →
+        </a>
+      </blockquote>`;
+    processInstagramEmbeds();
   } else {
     igContainer.style.display = 'none';
     igContainer.innerHTML = '';
