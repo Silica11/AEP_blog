@@ -26,7 +26,7 @@ function getInstagramEmbedUrl(postUrl) {
   const parts = cleanStr.split('/');
   const typeIndex = parts.findIndex(p => p === 'p' || p === 'reel');
   if (typeIndex !== -1 && parts.at(typeIndex + 1)) {
-    return 'https://instagram.com' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/embed/';
+    return 'https://instagram.com/' + parts.at(typeIndex) + '/' + parts.at(typeIndex + 1) + '/embed/';
   }
   return null;
 }
