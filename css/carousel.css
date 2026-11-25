@@ -1,4 +1,4 @@
-/* Finestra Carosello Instagram 3:4 ingrandita e ritagliata */
+/* Finestra Carosello Instagram */
 .ig-embed-wrapper {
   width: 100%;
   max-width: 360px;
@@ -11,10 +11,14 @@
   border: 1px solid var(--border-light);
 }
 
+/* Zoom e ritaglio del contenuto Instagram */
 .ig-embed-wrapper iframe {
   width: 100% !important;
-  height: 660px !important;
-  margin-top: -54px !important; /* Taglia via l'intestazione in alto */
+  height: 720px !important;
+  margin-top: -54px !important;
   border: none !important;
   display: block;
+
+  transform: scale(1.08);
+  transform-origin: top center;
 }
